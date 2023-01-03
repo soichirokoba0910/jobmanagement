@@ -1,120 +1,61 @@
-<?php
-$today = filter_input(INPUT_POST, 'today');
-$monthNext = filter_input(INPUT_POST, 'monthNext');
-$yearNext = filter_input(INPUT_POST, 'yearNext');
-$monthPrev = filter_input(INPUT_POST, 'monthPrev');
-$yearPrev = filter_input(INPUT_POST, 'yearPrev');
+<div class="card">
+  <div class="card-header" style="text-align: center;">
+      - 予約 -
+  </div>
+  <div class="card-body">
+      <ul>
+          <li>カレンダーより、ご希望の予約日をお選びください。</li>
+          <li>予約日は次回予約のみお取りいただけます。</li>
+          <li>予約日時を変更される場合は、いったんキャンセルしてから予約をお取りなおしください。</li>
+      </ul>
 
 
-if($today==1){
-    $month = date('n');
-    $year = date('Y');
-}
-if($monthNext > 12){
-    $monthNext = 1;
-    $yearNext++;
-}
-if($monthPrev === "0"){
-    $monthPrev = 12;
-    $yearPrev--;
-}
-$month = $monthNext??$monthPrev??date('n');
-$year =$yearNext??$yearPrev??date('Y');
+      <div class="calender">
+          <form class="prev-next-form"></form>
+          <table class="table">
+              <tr>
+                  <td colspan="2">
+                      <button class="btn btn-outline-secondary prev-next-btn" data-month="{{ $month->add(-1, 'month')->format('Y-m') }}"><</button>
+                  </td>
+                  <th colspan="3">
+                      <div class="text-center">
+                          {{ $month->year }}年{{ $month->month }}月
+                      </div>
+                  </th>
+                  <td colspan="2">
+                      <div class="text-right">
+                          <button class="btn btn-outline-secondary prev-next-btn" data-month="{{ $month->add(1, 'month')->format('Y-m') }}">></button>
+                      </div>
+                  </td>
+              </tr>
 
-$last_day = date('j', mktime(0, 0, 0, $month + 1, 0, $year));
-$calendar = array();
-$j = 0;
+              <tr>
+                  <th class="sun"  style="color: red"><div class="text-center">日</div></th>
+                  <th class="mon"><div class="text-center">月</div></th>
+                  <th class="tue"><div class="text-center">火</div></th>
+                  <th class="wed"><div class="text-center">水</div></th>
+                  <th class="thu"><div class="text-center">木</div></th>
+                  <th class="fri"><div class="text-center">金</div></th>
+                  <th class="sat"  style="color: blue"><div class="text-center">土</div></th>
+              </tr>
 
-
-
-for ($i = 1; $i < $last_day + 1; $i++) {
-    $week = date('w', mktime(0, 0, 0, $month, $i, $year));
-    if ($i == 1) {
-        for ($s = 1; $s <= $week; $s++) {
-            $calendar[$j]['day'] = '';
-            $j++;
-        }
-    }
-    $calendar[$j]['day'] = $i;
-    $j++;
-    if ($i == $last_day) {
-        for ($e = 1; $e <= 6 - $week; $e++) {
-            $calendar[$j]['day'] = '';
-            $j++;
-        }
-    }
-}
-
-?>
-
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="utf-8">
-  <title>カレンダー</title>
-  <link rel="stylesheet" href="css/stylesheet.css">
-</head>
-
-<body>
-  <table>
-    <thead>
-      <tr>
-        <form action="" method="post">
-          <th><button type="submit" id="prev">
-              &laquo;
-              <input type="hidden" name="monthPrev" value="<?php echo $month-1;?>">
-              <input type="hidden" name="yearPrev" value="<?php echo $year;?>">
-            </button></th>
-        </form>
-        <th id="title" colspan="5"><?php echo $year; ?>年<?php echo $month; ?>月
-        </th>
-        <form action="" method="post">
-          <th><button type="submit" id="next">
-              &raquo;
-              <input type="hidden" name="monthNext" value="<?php echo $month+1;?>">
-              <input type="hidden" name="yearNext" value="<?php echo $year;?>">
-            </button></th>
-        </form>
-      </tr>
-      <tr>
-        <th class="red">日</th>
-        <th>月</th>
-        <th>火</th>
-        <th>水</th>
-        <th>木</th>
-        <th>金</th>
-        <th class="blue">土</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <?php $cnt = 0; ?>
-        <?php foreach ($calendar as $key => $value): ?>
-        <td>
-          <p>
-            <?php $cnt++; ?>
-            <?php echo $value['day']; ?>
-          </p>
-        </td>
-        <?php if ($cnt == 7): ?>
-      </tr>
-      <tr>
-        <?php $cnt = 0; ?>
-        <?php endif; ?>
-        <?php endforeach; ?>
-      </tr>
-    </tbody>
-    <tfoot>
-      <tr>
-        <form action="" method="post">
-          <td colspan="7">
-            <button type="submit" id="today"> 現在に戻る
-              <input type="hidden" name="today" value="1">
-            </button>
-          </td>
-        </form>
-      </tr>
-    </tfoot>
-  </table>
-</body>
-</html>
+              @foreach ($calendar as $week)
+                  <tr>
+                      @foreach ($week as $date)
+                          <td>
+                              <div class="text-center">
+                                  @if($date->date->weekDay() === 0)
+                                      <span class="sun" style="color: red">{{ $date->date->day }}</span>
+                                  @elseif($date->date->weekDay() === 6)
+                                      <span class="sat" style="color:blue;">{{ $date->date->day }}</span>
+                                  @else
+                                      <span class="other">{{ $date->date->day }}</span>
+                                  @endif
+                              </div>
+                          </td>
+                      @endforeach
+                  </tr>
+              @endforeach
+          </table>
+      </div>
+</div>

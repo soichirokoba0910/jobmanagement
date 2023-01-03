@@ -17,4 +17,5 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('hello','App\Http\Controllers\indexController@index');
+Route::get('index','App\Http\Controllers\IndexController@index');
+Route::post('index','App\Http\Controllers\IndexController@post');
